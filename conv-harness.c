@@ -362,8 +362,7 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
     const int kernel_orderminus1 = kernel_order-1;
     __m128d x4, k4,product4;
     double temp[2];
-    int * outputArray = calloc(sizeof(double), nkernels*width*height);
-#pragma omp parallel for collapse(3)
+#pragma omp parallel for collapse(3) private(m,w,h)
     for (m = 0; m < nkernels; m++)
     {
         for (w = 0; w < width; w++)
@@ -371,7 +370,7 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
             for (h = 0; h < height; h++)
             {
                 double sum = 0;
-#pragma omp parallel for reduction(+:sum) collapse(3) private(temp,x4, k4,product4,c,x,y)
+#pragma omp parallel for reduction(+:sum) collapse(3) private(temp,x4, k4,product4,c,x,y) 
                 for (c = 0; c < nchannels; c++)
                 {
                     for(x = 0; x<kernel_order; x++)
@@ -394,16 +393,10 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
                         }
                     }
                 }
-                outputArray[nkernels+width+height]=sum;
+                output[m][w][h] = sum;
             }
         }
     }
-    for (m = 0; m < nkernels; m++)
-    {
-        for (w = 0; w < width; w++)
-        {
-            for (h = 0; h < height; h++)
-            {output[m][w][h] = outputArray[m+w+h];}}}
     //printf("My output: %f\n", output[9][11][10]);
     //multichannel_conv(image, kernels, output, width,
     //                  height, nchannels, nkernels, kernel_order);
