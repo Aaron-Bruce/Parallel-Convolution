@@ -359,24 +359,23 @@ void multichannel_conv(double ***image, double ****kernels,
 void student_conv(double ***image,double ****kernels, double ***output,int width, int height, int nchannels, int nkernels,int kernel_order)
 {
     int h, w, x, y, c, m,off,other;
-    __m128d x4, k4,sum4,product4;
-    
-    double temp[2];    
+    double temp[2];   
     for (m = 0; m < nkernels; m++)
     {
         for (w = 0; w < width; w++)
         {
             for (h = 0; h < height; h++)
             {
-                //double sum = 0.0;
+                __m128d sum4;
                 sum4 = _mm_setzero_pd();
                 for (c = 0; c < nchannels; c++)
                 {
-                    //printf("%d %d %f %f\n",w+2, h+1, image[w+2][h+1][c],imageD[w+2][h+1][c]);
                     for(x = 0; x<kernel_order; x++)
                     {
+#pragma omp parallel for
                         for(y = 0; y<kernel_order; y += 2)
                         {
+                          __m128d x4, k4,product4;
                           if(y == kernel_order-1)
                           {
                             k4 = _mm_loadu_pd(&(kernels[m][c][x][y]));
@@ -389,7 +388,10 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
                             x4 = _mm_set_pd(image[w+x][h+y+1][c],image[w+x][h+y][c]);
                           }
                           product4 = _mm_mul_pd(k4,x4);
+#pragma omp critical
+{
                           sum4 = _mm_add_pd(sum4,product4);
+                          }
                         }
                     }
                 }
