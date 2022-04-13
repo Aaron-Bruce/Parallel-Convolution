@@ -360,20 +360,22 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
 {
     int h, w, x, y, c, m,off,other;
     double temp[2];   
+#pragma omp parallel for collapse(3)
     for (m = 0; m < nkernels; m++)
     {
         for (w = 0; w < width; w++)
         {
             for (h = 0; h < height; h++)
             {
-                double sum = 0;
-#pragma omp parallel for collapse(3) reduction(+:sum)
+                double sum=0;
+#pragma omp parallel for reduction(+:sum) collapse(3)
                 for (c = 0; c < nchannels; c++)
                 {
                     for(x = 0; x<kernel_order; x++)
                     {
                         for(y = 0; y<kernel_order; y += 2)
                         {
+                          double localsum;
                           __m128d x4, k4,product4;
                           if(y == kernel_order-1)
                           {
