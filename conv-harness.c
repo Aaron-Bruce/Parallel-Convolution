@@ -362,7 +362,7 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
     const int kernel_orderminus1 = kernel_order-1;
     __m128d x4, k4,product4;
     double temp[2];
-//#pragma omp parallel for collapse(3)
+#pragma omp parallel for collapse(3)
     for (m = 0; m < nkernels; m++)
     {
         for (w = 0; w < width; w++)
@@ -370,7 +370,7 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
             for (h = 0; h < height; h++)
             {
                 double sum = 0;
-#pragma omp parallel for reduction(+:sum) collapse(3) private(temp,x4, k4,product4)
+#pragma omp parallel for reduction(+:sum) collapse(3) private(temp,x4, k4,product4,c,x,y)
                 for (c = 0; c < nchannels; c++)
                 {
                     for(x = 0; x<kernel_order; x++)
