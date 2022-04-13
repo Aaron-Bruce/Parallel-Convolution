@@ -366,13 +366,12 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
         {
             for (h = 0; h < height; h++)
             {
-                __m128d sum4;
-                sum4 = _mm_setzero_pd();
+                double sum = 0;
+#pragma omp parallel for collapse(3) reduction(+:sum)
                 for (c = 0; c < nchannels; c++)
                 {
                     for(x = 0; x<kernel_order; x++)
                     {
-#pragma omp parallel for
                         for(y = 0; y<kernel_order; y += 2)
                         {
                           __m128d x4, k4,product4;
@@ -388,16 +387,13 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
                             x4 = _mm_set_pd(image[w+x][h+y+1][c],image[w+x][h+y][c]);
                           }
                           product4 = _mm_mul_pd(k4,x4);
-#pragma omp critical
-{
-                          sum4 = _mm_add_pd(sum4,product4);
-                          }
+                          double temp[2];   
+                          _mm_storeu_pd(temp, product4);
+                          sum += temp[0]+temp[1];
                         }
                     }
                 }
-                _mm_storeu_pd(temp, sum4);
-                //printf("%f %f", temp[0], temp[1]);
-                output[m][w][h] = temp[0] + temp[1];
+                output[m][w][h] = sum;
             }
         }
     }
