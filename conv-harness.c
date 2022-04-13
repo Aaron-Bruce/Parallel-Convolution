@@ -393,6 +393,7 @@ void student_conv(double ***image,double ****kernels, double ***output,int width
                         }
                     }
                 }
+#pragma omp critical
                 output[m][w][h] = sum;
             }
         }
