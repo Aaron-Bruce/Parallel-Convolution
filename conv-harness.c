@@ -1,3 +1,5 @@
+//Group members - Conor Doherty, Aaron Bruce, John Cosgrove
+
 /* Test and timing harness program for developing a multichannel
    multikernel convolution (as used in deep learning networks)
 
