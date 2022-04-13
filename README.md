@@ -2,7 +2,7 @@
 # **CSU33014** 
 # **Conor Doherty, Aaron Bruce, John Cosgrove**
 *General Strategy*<br />
-For our approach, as stated in the assignment brief, we paid close attention to writing an efficient algorithm but also to other issues such as locality of data access and multiple available processor cores. Our group came together several times in order to work on our approach, with the end result being an amalgamation of optimisations suggested by each member. We made incremental changes which eventually brought our range of input sizes within the desired epsilon, while also negotiating segmentation faults and other errors along the way.
+For our approach, as stated in the assignment brief, we paid close attention to writing an efficient algorithm but also to other issues such as locality of data access and multiple available processor cores. Our group came together several times in order to work on our approach, with the end result being an amalgamation of optimisations suggested by each member. We made incremental changes which eventually brought our range of input sizes within the desired epsilon, while also negotiating segmentation faults and other errors along the way.<br />
 *Optimisations*<br />
 An important detail in our optimisation strategy was utilising _m128d instructions as opposed to _m128. It quickly became apparent that _m128 operations resulted in values which were not precise enough and led to the sum of absolute differences being very large, even with the smallest input values. Therefore it was imperative from the offset to use operations such as _mm_mul_pd instead of _mm_mul_ps so ensure accuracy in all calculations.
 
